@@ -1,4 +1,4 @@
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
@@ -12,7 +12,7 @@ public class RicartAgrawala {
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
-        Map<Integer, Process> processes = new HashMap<>();
+        Map<Integer, Process> processes = new ConcurrentHashMap<>();
         Random random = new Random();
 
         // Atribui números aleatórios únicos a cada processo para definir a prioridade

@@ -1,6 +1,6 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.Condition;
@@ -18,7 +18,7 @@ class Process implements Runnable {
         this.priority = priority;
         this.lock = lock;
         this.processes = processes;
-        this.requestPermissions = new HashMap<>();
+        this.requestPermissions = new ConcurrentHashMap<>();
         this.condition = condition;
 
         // Inicializa as permissões como falsas
@@ -40,12 +40,12 @@ class Process implements Runnable {
                 System.out.println("Processo " + id + " solicitou permissão aos outros processos.");
 
                 // Aguarda até receber permissão de todos os outros processos
-                while (!hasAllPermissions() || requestPermissions.size() == 0) {
+                while (!hasAllPermissions() || requestPermissions.size() <= 3) {
                     Thread.sleep(1000);
                     requestPermissionsFromOthers();
                     Thread.sleep(500);
                     System.out.println("Processo " + id + " aguardando permissão. Fila de requisições pendentes: "
-                            + requestPermissions + "Prioridade " + priority);
+                            + requestPermissions + " Prioridade " + priority);
                     condition.await(); // Aguarda até receber todas as permissões
                 }
 
@@ -102,7 +102,7 @@ class Process implements Runnable {
         lock.lock();
         try {
             // Verifica se a prioridade do solicitante é maior ou igual à do processo atual
-            if (requestingPriority > priority || (requestingPriority == priority && requestingId < id)) {
+            if (requestingPriority > priority || (requestingPriority == priority && requestingId > id)) {
                 // Concede permissão ao processo solicitante
                 requestPermissions.put(requestingId, true);
                 condition.signalAll(); // Notifica threads aguardando
