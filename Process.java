@@ -102,7 +102,7 @@ class Process implements Runnable {
         lock.lock();
         try {
             // Verifica se a prioridade do solicitante é maior ou igual à do processo atual
-            if (requestingPriority < priority || (requestingPriority == priority && requestingId < id)) {
+            if (requestingPriority > priority || (requestingPriority == priority && requestingId < id)) {
                 // Concede permissão ao processo solicitante
                 requestPermissions.put(requestingId, true);
                 condition.signalAll(); // Notifica threads aguardando
